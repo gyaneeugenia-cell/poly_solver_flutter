@@ -1,5 +1,6 @@
-import 'dart:typed_data';
-
-void downloadCsvWeb(Uint8List bytes, String filename) {
-  // No-op on non-web platforms
+void downloadWebFile({
+  required List<int> bytes,
+  required String filename,
+}) {
+  // Stub: does nothing on non-web platforms
 }

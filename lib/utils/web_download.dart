@@ -1,8 +1,10 @@
 import 'dart:html' as html;
-import 'dart:typed_data';
 
-void downloadCsvWeb(Uint8List bytes, String filename) {
-  final blob = html.Blob([bytes], 'text/csv;charset=utf-8');
+void downloadWebFile({
+  required List<int> bytes,
+  required String filename,
+}) {
+  final blob = html.Blob([bytes], 'application/octet-stream');
   final url = html.Url.createObjectUrlFromBlob(blob);
 
   final anchor = html.AnchorElement(href: url)

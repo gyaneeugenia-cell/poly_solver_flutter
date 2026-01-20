@@ -26,9 +26,11 @@ Future<void> login({
     },
   );
 
-  if (response.statusCode != 200) {
-    throw Exception('Login failed: ${response.body}');
-  }
+if (response.statusCode != 200) {
+  final body = jsonDecode(response.body);
+  throw Exception(body['detail'] ?? 'Login failed');
+}
+
 
   final data = jsonDecode(response.body);
   _token = data['access_token'];
@@ -147,7 +149,77 @@ Future<void> register({
     final decoded = jsonDecode(response.body) as List<dynamic>;
     return decoded.cast<Map<String, dynamic>>();
   }
+    // --------------------
+  // FORGOT PASSWORD
+  // --------------------
+  Future<void> forgotPassword({
+    required String email,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/forgot-password'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'email': email}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to send reset email');
+    }
+  }
+
+  // --------------------
+  // RESET PASSWORD
+  // --------------------
+  Future<void> resetPassword({
+    required String email,
+    required String token,
+    required String newPassword,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/reset-password'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'email': email,
+        'token': token,
+        'new_password': newPassword,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(response.body);
+    }
+  }
+
+  // --------------------
+  // CHANGE EXPIRED PASSWORD
+  // --------------------
+  Future<void> changeExpiredPassword({
+    required String username,
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/change-expired-password'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'username': username,
+        'old_password': oldPassword,
+        'new_password': newPassword,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(response.body);
+    }
+  }
+
 }
+
 
 
 // --------------------

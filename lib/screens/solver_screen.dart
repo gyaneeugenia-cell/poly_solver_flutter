@@ -63,7 +63,7 @@ class _SolverScreenState extends State<SolverScreen> {
   @override
   void initState() {
     super.initState();
-    _loadHistoryFromServer();
+    Future.delayed(const Duration(seconds: 1), _loadHistoryFromServer);
   }
 
   final _degreeCtrl = TextEditingController(text: '2');
@@ -493,8 +493,24 @@ String _caretToSuperscript(String eq) {
     }
     return path;
   }
+  
 
   Future<void> _exportGraphJpeg() async {
+if (kIsWeb) {
+  final pngBytes = await _captureGraphPngBytes();
+  if (pngBytes == null) return;
+
+  downloadWebFile(
+    bytes: pngBytes,
+    filename: 'polynomial_graph.png',
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Graph downloaded as PNG')),
+  );
+  return;
+}
+
     if (!_hasSolved || !_hasPlotted || !_showGraph) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Plot the graph first')),
@@ -542,17 +558,16 @@ Future<void> _exportHistoryCsv() async {
   }
 
   final sb = StringBuffer();
-  sb.writeln(
-    'username,timestamp,equation,real_roots,complex_roots',
-  );
+  sb.writeln('username,timestamp,equation');
+
 
   for (final h in _history) {
     sb.writeln(
       '${_csvEscape(h.userName)},'
       '${_csvEscape(_formatTimestamp(h.timestamp))},'
-      '${_csvEscape(h.equation)},'
-      '${_csvEscape(h.realRootsText)},'
-      '${_csvEscape(h.complexRootsText)}',
+      '${_csvEscape(_caretToSuperscript(h.equation))}',
+
+
     );
   }
 
@@ -561,10 +576,15 @@ Future<void> _exportHistoryCsv() async {
   // -----------------------------
   // WEB DOWNLOAD
   // -----------------------------
+
 if (kIsWeb) {
-  downloadCsvWeb(
-    Uint8List.fromList(csvBytes),
-    'polynomial_history.csv',
+  downloadWebFile(
+    bytes: csvBytes,
+    filename: 'polynomial_history.csv',
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('CSV file downloaded')),
   );
   return;
 }
@@ -649,20 +669,21 @@ Future<void> _printHistoryAndGraph() async {
   final pdfBytes = await doc.save();
 
 
-// MOBILE WEB (iOS / Android) → SHARE SHEET
-if (_isMobileWeb) {
-  await Printing.sharePdf(
-    bytes: pdfBytes,
-    filename: 'polynomial_history.pdf',
+// WEB (all browsers)
+if (kIsWeb) {
+  await Printing.layoutPdf(
+    onLayout: (_) async => pdfBytes,
+    name: 'polynomial_history.pdf',
   );
   return;
 }
 
 
-  // DESKTOP → PRINT
-  await Printing.layoutPdf(
-    onLayout: (_) async => pdfBytes,
-  );
+// DESKTOP (Windows / macOS / Linux)
+await Printing.layoutPdf(
+  onLayout: (_) async => pdfBytes,
+);
+
 }
 
 
@@ -1047,17 +1068,16 @@ PopupMenuItem(
 ),
 
 
-    if (!kIsWeb)
-      const PopupMenuItem(
-        value: 'image',
-        child: Text('Export graph'),
-      ),
+const PopupMenuItem(
+  value: 'image',
+  child: Text('Export graph'),
+),
 
-    if (!kIsWeb)
-      const PopupMenuItem(
-        value: 'csv',
-        child: Text('Export history'),
-      ),
+const PopupMenuItem(
+  value: 'csv',
+  child: Text('Export history (CSV)'),
+),
+
 
     const PopupMenuItem(
       value: 'logout',

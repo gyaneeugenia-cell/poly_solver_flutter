@@ -16,6 +16,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _loading = false;
   String? _error;
+  bool _showPassword1 = false;
+  bool _showPassword2 = false;
+
+  bool _isPasswordStrong(String password) {
+    final hasUppercase = RegExp(r'[A-Z]').hasMatch(password);
+    final hasNumber = RegExp(r'[0-9]').hasMatch(password);
+    final hasSpecial = RegExp(r'[!@#\$&*~^%+=_\-]').hasMatch(password);
+    final hasMinLength = password.length >= 8;
+    return hasUppercase && hasNumber && hasSpecial && hasMinLength;
+  }
 
   Future<void> _register() async {
     setState(() {
@@ -34,10 +44,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (p != p2) {
         throw Exception('Passwords do not match');
       }
+      if (!_isPasswordStrong(p)) {
+        throw Exception(
+          'Password must be at least 8 characters long and include:\n'
+          '• One capital letter\n'
+          '• One number\n'
+          '• One special character',
+        );
+      }
 
-      await widget.session.api.register(username: u, password: p);
+      // ✅ FASTAPI REGISTRATION (NOT SUPABASE)
+      await widget.session.api.register(
+        username: u,
+        password: p,
+      );
 
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Registration successful. Please login.')),
       );
@@ -78,15 +101,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 12),
               TextField(
                 controller: _passCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: !_showPassword1,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _showPassword1
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _showPassword1 = !_showPassword1;
+                      });
+                    },
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _pass2Ctrl,
-                obscureText: true,
-                decoration:
-                    const InputDecoration(labelText: 'Confirm password'),
+                obscureText: !_showPassword2,
+                decoration: InputDecoration(
+                  labelText: 'Confirm password',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _showPassword2
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _showPassword2 = !_showPassword2;
+                      });
+                    },
+                  ),
+                ),
               ),
               const SizedBox(height: 18),
               if (_error != null)
