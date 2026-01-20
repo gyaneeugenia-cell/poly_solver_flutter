@@ -11,6 +11,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _userCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _pass2Ctrl = TextEditingController();
 
@@ -35,11 +36,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
       final u = _userCtrl.text.trim();
+      final email = _emailCtrl.text.trim();
       final p = _passCtrl.text;
       final p2 = _pass2Ctrl.text;
 
-      if (u.isEmpty || p.isEmpty) {
-        throw Exception('Missing fields');
+      if (u.isEmpty || email.isEmpty || p.isEmpty) {
+        throw Exception('All fields are required');
       }
       if (p != p2) {
         throw Exception('Passwords do not match');
@@ -53,17 +55,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
       }
 
-      // ✅ FASTAPI REGISTRATION (NOT SUPABASE)
       await widget.session.api.register(
         username: u,
+        email: email,
         password: p,
+        // ⚠️ Email is collected for backend storage and password reset
       );
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful. Please login.')),
+        const SnackBar(
+          content: Text('Registration successful. Please login.'),
+        ),
       );
+
       Navigator.pop(context);
     } catch (e) {
       setState(() {
@@ -79,6 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void dispose() {
     _userCtrl.dispose();
+    _emailCtrl.dispose();
     _passCtrl.dispose();
     _pass2Ctrl.dispose();
     super.dispose();
@@ -97,6 +104,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextField(
                 controller: _userCtrl,
                 decoration: const InputDecoration(labelText: 'Username'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _emailCtrl,
+                decoration: const InputDecoration(labelText: 'Email'),
               ),
               const SizedBox(height: 12),
               TextField(

@@ -56,17 +56,31 @@ Future<void> _login() async {
     final msg = e.toString();
 
     // 🔒 PASSWORD EXPIRED FLOW
-    if (msg.contains('PASSWORD_EXPIRED')) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => ChangeExpiredPasswordScreen(
-            session: widget.session,
-            username: _userCtrl.text.trim(),
-          ),
-        ),
-      );
-      return;
-    }
+if (msg.contains('PASSWORD_EXPIRED')) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text(
+        'Password expired. Please change password to log in.',
+      ),
+      duration: Duration(seconds: 2),
+    ),
+  );
+
+  await Future.delayed(const Duration(seconds: 2));
+
+  if (!mounted) return;
+
+  Navigator.of(context).pushReplacement(
+    MaterialPageRoute(
+      builder: (_) => ChangeExpiredPasswordScreen(
+        session: widget.session,
+        username: _userCtrl.text.trim(),
+      ),
+    ),
+  );
+  return;
+}
+
 
     // ❌ NORMAL LOGIN ERROR
     setState(() {
@@ -164,7 +178,7 @@ TextButton(
   },
   child: const Text('Forgot password?'),
 ),
-
+const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(

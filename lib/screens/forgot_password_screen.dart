@@ -40,6 +40,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            const Text(
+              'Enter your email to receive an email for password reset',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 12),
+
             TextField(
               controller: _emailCtrl,
               decoration: const InputDecoration(labelText: 'Email'),

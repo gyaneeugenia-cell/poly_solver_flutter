@@ -43,20 +43,16 @@ if (response.statusCode != 200) {
   // --------------------
 Future<void> register({
   required String username,
+  required String email,
   required String password,
 }) async {
-
-  // Frontend validation to match backend rules
-  if (password.length < 6) {
-    throw Exception('Password must be at least 6 characters long');
-  }
-
   final response = await http
       .post(
         Uri.parse('$baseUrl/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'username': username,
+          'email': email,
           'password': password,
         }),
       )
@@ -66,8 +62,6 @@ Future<void> register({
     throw Exception('Registration failed: ${response.body}');
   }
 }
-
-
 
   // --------------------
   // SOLVE POLYNOMIAL
