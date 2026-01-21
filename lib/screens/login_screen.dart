@@ -166,19 +166,29 @@ if (msg.contains('PASSWORD_EXPIRED')) {
                 ),
               ),
               const SizedBox(height: 10),
-TextButton(
-  onPressed: () {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ForgotPasswordScreen(
-          session: widget.session,
+SizedBox(
+  width: double.infinity,
+  child: OutlinedButton(
+    onPressed: () {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ForgotPasswordScreen(
+            session: widget.session,
+          ),
         ),
+      );
+    },
+    style: OutlinedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
-    );
-  },
-  child: const Text('Forgot password?'),
+    ),
+    child: const Text('Forgot password'),
+  ),
 ),
 const SizedBox(height: 10),
+
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
