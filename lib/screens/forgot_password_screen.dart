@@ -14,23 +14,51 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailCtrl = TextEditingController();
   bool _loading = false;
 
-  Future<void> _submit() async {
-    setState(() => _loading = true);
+Future<void> _submit() async {
+  final email = _emailCtrl.text.trim();
 
-    await widget.session.api.forgotPassword(
-      email: _emailCtrl.text.trim(),
+  if (email.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Enter your email to receive a password reset link'),
+      ),
     );
+    return;
+  }
 
-    setState(() => _loading = false);
+  setState(() => _loading = true);
+
+  try {
+    await widget.session.api.forgotPassword(email: email);
 
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Check your email for reset link')),
+      const SnackBar(
+        content: Text(
+          'If the email exists, a password reset link has been sent.',
+        ),
+      ),
     );
 
     Navigator.pop(context);
+  } catch (e) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          e.toString().replaceAll('Exception: ', ''),
+        ),
+      ),
+    );
+  } finally {
+    if (mounted) {
+      setState(() => _loading = false);
+    }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
