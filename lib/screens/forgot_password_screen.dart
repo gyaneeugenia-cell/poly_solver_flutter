@@ -63,7 +63,7 @@ Future<void> _submit() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      appBar: AppBar(title: const Text('Forgot password')),
 body: Center(
   child: ConstrainedBox(
     constraints: const BoxConstraints(maxWidth: 420),
