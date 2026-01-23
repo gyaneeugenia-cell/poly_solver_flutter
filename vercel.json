@@ -6,17 +6,6 @@
       "use": "@vercel/static"
     }
   ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
-      ]
-    }
-  ],
   "routes": [
     {
       "src": "/(.*\\.(js|css|json|wasm|png|jpg|jpeg|svg|ico|otf|ttf|woff|woff2))",
