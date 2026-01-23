@@ -12,12 +12,16 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-store, must-revalidate"
+          "value": "no-store"
         }
       ]
     }
   ],
   "routes": [
+    {
+      "src": "/(.*\\.(js|css|json|wasm|png|jpg|jpeg|svg|ico|otf|ttf|woff|woff2))",
+      "dest": "/build/web/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "/build/web/index.html"
