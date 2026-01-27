@@ -6,6 +6,21 @@
       "use": "@vercel/static"
     }
   ],
+  "headers": [
+    {
+      "source": "/(.*\\.(woff2|woff|ttf|otf))",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "font/woff2"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
   "routes": [
     {
       "src": "/(.*\\.(js|css|json|wasm|png|jpg|jpeg|svg|ico|otf|ttf|woff|woff2))",
