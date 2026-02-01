@@ -1,11 +1,15 @@
 {
-  "framework": null,
-  "buildCommand": null,
-  "outputDirectory": "build/web",
+  "version": 2,
+  "builds": [
+    {
+      "src": "build/web/**",
+      "use": "@vercel/static"
+    }
+  ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/build/web/index.html"
     }
   ]
 }
